@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15
+    container_name: blog_db
+
+    environment:
+      POSTGRES_USER: blog_user
+      POSTGRES_PASSWORD: blog_password
+      POSTGRES_DB: blog_db
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./app/scripts/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./app/scripts/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+
+  app:
+    build: .
+
+    container_name: blog_app
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - db
+
+    env_file:
+      - .env
+    command: >
+      sh -c "sleep 3 && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+volumes:
+  postgres_data:
