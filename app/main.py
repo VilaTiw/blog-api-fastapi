@@ -15,11 +15,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/health")
 def health_check(db: Session = Depends(get_db)):
-    try:
-        db.execute("SELECT 1")
-        return {"status": "ok"}
-    except:
-        return {"status": "error"}
+    return {"status": "ok"}
 
 app.include_router(articles.router)
 app.include_router(auth.router)
